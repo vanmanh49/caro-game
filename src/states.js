@@ -77,6 +77,7 @@ export function createStates({ input, audio, store, go, levelCount = LEVELS.leng
         try {
           world = createWorld({ level: load(session.levelIndex), session, audio });
         } catch (e) {
+          console.error(e);
           go('error', { message: e.message });
           return;
         }

@@ -50,6 +50,10 @@ const loop = startLoop({
       ctx.fillText('PAUSED', VIEW_W / 2, VIEW_H / 2);
     }
   },
+  onError(e) {
+    console.error(e);
+    machine.go('error', { message: e.message || String(e) });
+  },
 });
 
 machine.go('title');

@@ -51,7 +51,7 @@ export class Koopa {
 
   knock(dir) {
     this.state = 'knocked';
-    this.body.vx = dir * 60;
+    this.body.vx = dir * ENEMY.knockSpeed;
     this.body.vy = -ENEMY.knockVel;
   }
 

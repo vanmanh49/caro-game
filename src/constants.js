@@ -37,6 +37,7 @@ export const PLAYER = {
   deathTotal: 2.5,
   maxFireballs: 2,
   flagSlideSpeed: 110,
+  flagDropSpeed: 220,
   walkOutSpeed: 70,
   walkOutDistance: 48,
   walkOutTimeout: 2,
@@ -48,6 +49,7 @@ export const ENEMY = {
   squashTime: 0.5,
   kickCooldown: 0.25,
   knockVel: 180,
+  knockSpeed: 60,
   activeBehind: 64,
   activeAhead: 32,
 };

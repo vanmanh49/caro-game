@@ -18,18 +18,35 @@ export function createStepper(step, maxFrame) {
   };
 }
 
-export function startLoop({ update, render, raf = (f) => requestAnimationFrame(f), now = () => performance.now() }) {
+export function startLoop({
+  update,
+  render,
+  raf = (f) => requestAnimationFrame(f),
+  now = () => performance.now(),
+  onError,
+}) {
   const stepper = createStepper(STEP, MAX_FRAME);
   let last = now();
   let running = true;
   function frame() {
     if (!running) return;
-    const t = now();
-    const dt = (t - last) / 1000;
-    last = t;
-    const alpha = stepper.advance(dt, update);
-    render(alpha);
-    raf(frame);
+    try {
+      const t = now();
+      const dt = (t - last) / 1000;
+      last = t;
+      const alpha = stepper.advance(dt, update);
+      render(alpha);
+    } catch (e) {
+      stepper.reset();
+      try {
+        if (onError) onError(e);
+        else console.error(e);
+      } catch (handlerError) {
+        console.error(handlerError);
+      }
+    } finally {
+      if (running) raf(frame);
+    }
   }
   raf(frame);
   return {

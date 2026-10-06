@@ -7,7 +7,7 @@
   <style>
     html, body { margin: 0; height: 100%; background: #000; }
     body { display: flex; align-items: center; justify-content: center; }
-    canvas { height: min(100vh, 672px); aspect-ratio: 8 / 7; image-rendering: pixelated; background: #5c94fc; }
+    canvas { width: min(100vw, calc(100vh * 8 / 7), 768px); height: auto; aspect-ratio: 8 / 7; flex: none; image-rendering: pixelated; background: #5c94fc; }
   </style>
 </head>
 <body>

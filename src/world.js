@@ -49,8 +49,8 @@ export function updateWorld(world, dt, input) {
     player.ceilingHit = null;
   }
   if (player.state === 'alive' && overlaps(player.body, world.pole)) player.grabFlag(world, world.pole);
-  if (player.state === 'flag') {
-    world.flagY = Math.min(world.flagY + PLAYER.flagSlideSpeed * dt, world.pole.y + world.pole.h - 16);
+  if (player.state === 'flag' || player.state === 'walkout') {
+    world.flagY = Math.min(world.flagY + PLAYER.flagDropSpeed * dt, world.pole.y + world.pole.h - 16);
   }
   camera.update(player.body.x + player.body.w / 2);
   for (const e of world.entities) if (isLive(world, e)) e.update(dt, world);

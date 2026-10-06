@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { updateWorld } from '../src/world.js';
 import { resolveInteractions } from '../src/interactions.js';
-import { GAME, PLAYER, TILE } from '../src/constants.js';
+import { GAME, PLAYER, TILE, ENEMY } from '../src/constants.js';
 import { Fireball } from '../src/entities/fireball.js';
 import { makeWorld, idleInput } from './helpers.js';
 
@@ -286,6 +286,28 @@ test('the flag sequence ends in done even when a wall blocks the walk-out', () =
   assert.equal(world.player.state, 'done');
   assert.ok(world.flagY > flagY0, 'the pennant slid down');
   assert.ok(steps / 60 <= PLAYER.walkOutTimeout + 3, `took ${steps} steps`);
+});
+
+test('the pennant reaches the bottom of the pole by the end of the flag sequence', () => {
+  const world = makeWorld();
+  touchPole(world);
+  let steps = 0;
+  while (world.player.state !== 'done' && steps < 60 * 8) {
+    updateWorld(world, DT, idleInput);
+    steps++;
+  }
+  assert.equal(world.player.state, 'done');
+  assert.equal(world.flagY, world.pole.y + world.pole.h - 16);
+});
+
+test('knocked goombas and koopas fly off at ENEMY.knockSpeed', () => {
+  const world = makeWorld({ edit: (g) => { g[11][12] = 'G'; g[11][14] = 'K'; } });
+  const g = first(world, 'goomba');
+  const k = first(world, 'koopa');
+  g.knock(1);
+  k.knock(1);
+  assert.equal(g.body.vx, ENEMY.knockSpeed);
+  assert.equal(k.body.vx, ENEMY.knockSpeed);
 });
 
 test('the level timer counts down while playing', () => {

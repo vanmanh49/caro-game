@@ -44,8 +44,17 @@ test('three deaths end the game; the first two restart the level', () => {
 
 test('a level that fails to load shows the error state with its message', () => {
   const { states, calls } = setup({ load: () => { throw new LevelError('bad level: row 3, col 5'); } });
-  states.playing.enter();
+  const logged = [];
+  const orig = console.error;
+  console.error = (e) => logged.push(e);
+  try {
+    states.playing.enter();
+  } finally {
+    console.error = orig;
+  }
   assert.deepEqual(calls, [['error', { message: 'bad level: row 3, col 5' }]]);
+  assert.equal(logged.length, 1, 'the error is logged to the console');
+  assert.ok(logged[0] instanceof LevelError);
 });
 
 test('clearing the last level pays the time bonus, goes to win, and saves the high score', () => {
