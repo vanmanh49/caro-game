@@ -92,3 +92,22 @@ test('standing on the ground resets the stomp chain', () => {
   for (let i = 0; i < 5; i++) p.update(DT, world, idleInput);
   assert.equal(p.stompChain, 0);
 });
+
+test('dying clears invincibility so the death animation is visible', () => {
+  const world = worldOn(open());
+  const p = playerAt('big');
+  p.hurt(world);
+  assert.ok(p.invincible > 0);
+  p.die(world);
+  assert.equal(p.state, 'dying');
+  assert.equal(p.invincible, 0);
+});
+
+test('die is idempotent', () => {
+  const world = worldOn(open());
+  const p = playerAt('small');
+  p.die(world);
+  p.die(world);
+  assert.deepEqual(world.audio.calls, ['stopMusic', 'death']);
+  assert.equal(p.state, 'dying');
+});

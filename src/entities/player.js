@@ -70,6 +70,7 @@ export class Player {
   die(world) {
     if (this.state !== 'alive') return;
     this.state = 'dying';
+    this.invincible = 0; // a frozen blink phase would hide the death animation
     this.deathTimer = 0;
     this.hopped = false;
     this.body.vx = 0;
