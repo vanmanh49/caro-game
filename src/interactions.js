@@ -32,4 +32,16 @@ export function resolveInteractions(world) {
       world.audio.play('kick');
     }
   }
+
+  for (const fb of live) {
+    if (!fb.isFireball || !fb.alive) continue;
+    for (const e of enemies) {
+      if (!e.alive || !e.killable || !overlaps(fb.body, e.body)) continue;
+      e.knock(Math.sign(fb.body.vx) || 1);
+      fb.alive = false;
+      addScore(world.session, GAME.scores.fireballKill);
+      world.audio.play('kick');
+      break;
+    }
+  }
 }

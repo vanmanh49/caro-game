@@ -6,6 +6,7 @@ import { createFromSpawn } from './entities/index.js';
 import { drawBackground, drawTiles } from './render.js';
 import { resolveInteractions, isLive } from './interactions.js';
 import { inActiveRange } from './camera.js';
+import { hitBlock, updateBumps, bumpOffset } from './blocks.js';
 
 export function createWorld({ level, session, audio }) {
   const world = {
@@ -35,16 +36,21 @@ export function updateWorld(world, dt, input) {
     return;
   }
   player.update(dt, world, input);
+  if (player.ceilingHit) {
+    hitBlock(world, player.ceilingHit.col, player.ceilingHit.row, player);
+    player.ceilingHit = null;
+  }
   camera.update(player.body.x + player.body.w / 2);
   for (const e of world.entities) if (isLive(world, e)) e.update(dt, world);
   resolveInteractions(world);
   world.entities = world.entities.filter((e) => e.alive);
+  updateBumps(world, dt);
 }
 
 export function renderWorld(world, ctx, alpha) {
   const camX = world.camera.renderX(alpha);
   drawBackground(ctx);
   for (const e of world.entities) if (inActiveRange(world.camera, e.body)) e.render(ctx, world.camera, alpha);
-  drawTiles(ctx, world.tiles, camX);
+  drawTiles(ctx, world.tiles, camX, (c, r) => bumpOffset(world, c, r));
   world.player.render(ctx, world.camera, alpha);
 }

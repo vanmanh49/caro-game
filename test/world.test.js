@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { updateWorld } from '../src/world.js';
 import { resolveInteractions } from '../src/interactions.js';
 import { GAME } from '../src/constants.js';
+import { Fireball } from '../src/entities/fireball.js';
 import { makeWorld, idleInput } from './helpers.js';
 
 const DT = 1 / 60;
@@ -213,4 +214,43 @@ test('stomping two adjacent goombas in one pass does not hurt the player', () =>
   assert.equal(g2.state, 'squashed');
   assert.equal(world.player.state, 'alive');
   assert.equal(world.session.score, 300);
+});
+
+const fireInput = { isDown: () => false, wasPressed: (a) => a === 'fire' };
+
+test('a fire player shoots at most two fireballs at a time', () => {
+  const world = makeWorld({ power: 'fire' });
+  for (let i = 0; i < 3; i++) updateWorld(world, DT, fireInput);
+  assert.equal(world.entities.filter((e) => e.isFireball).length, 2);
+  assert.ok(world.audio.calls.includes('fireball'));
+});
+
+test('only a fire player can shoot', () => {
+  const world = makeWorld({ power: 'big' });
+  updateWorld(world, DT, fireInput);
+  assert.equal(world.entities.filter((e) => e.isFireball).length, 0);
+});
+
+test('a fireball knocks out an enemy and is consumed', () => {
+  const world = makeWorld({ edit: (g) => { g[11][10] = 'G'; } });
+  const g = first(world, 'goomba');
+  const fb = world.spawn(new Fireball(g.body.x, g.body.y, 1));
+  resolveInteractions(world);
+  assert.equal(g.state, 'knocked');
+  assert.equal(fb.alive, false);
+  assert.equal(world.session.score, GAME.scores.fireballKill);
+});
+
+test('a fireball bounces along the ground and dies on a wall', () => {
+  const world = makeWorld({ edit: (g) => { for (let r = 6; r <= 11; r++) g[r][12] = '#'; } });
+  const fb = world.spawn(new Fireball(100, 160, 1));
+  let bounced = false;
+  let landedOnce = false;
+  for (let i = 0; i < 180 && fb.alive; i++) {
+    updateWorld(world, DT, idleInput);
+    if (fb.body.onGround) landedOnce = true;
+    if (landedOnce && fb.body.vy < 0) bounced = true;
+  }
+  assert.equal(bounced, true);
+  assert.equal(fb.alive, false);
 });

@@ -6,6 +6,7 @@ import { sizeOf, applyPowerUp, applyHit, resizeBody, canResize } from '../player
 import { addScore } from '../session.js';
 import { FIRE_SWAP } from '../sprites.js';
 import { drawBodySprite } from '../render.js';
+import { Fireball } from './fireball.js';
 
 export class Player {
   constructor(x, bottomY, power = 'small') {
@@ -45,6 +46,7 @@ export class Player {
     if (jumped) world.audio.play('jump');
     applyGravity(b, dt);
     this.ceilingHit = moveBody(b, world.tiles, dt).ceiling;
+    if (this.power === 'fire' && input.wasPressed('fire')) this.shoot(world);
     if (b.onGround) this.stompChain = 0;
     this.invincible = Math.max(0, this.invincible - dt);
     this.animTime += (dt * Math.abs(b.vx)) / 40;
@@ -105,6 +107,15 @@ export class Player {
     if (next !== this.power) this.changePower(next, world.tiles);
     addScore(world.session, GAME.scores.powerUp);
     world.audio.play('powerup');
+  }
+
+  shoot(world) {
+    const live = world.entities.filter((e) => e.isFireball && e.alive).length;
+    if (live >= PLAYER.maxFireballs) return;
+    const b = this.body;
+    const dir = this.motor.facing;
+    world.spawn(new Fireball(dir > 0 ? b.x + b.w : b.x - 8, b.y + 10, dir));
+    world.audio.play('fireball');
   }
 
   render(ctx, camera, alpha) {
