@@ -15,13 +15,16 @@ export class Player {
     this.body = createBody(x, bottomY - size.h, size.w, size.h);
     this.motor = createMotor();
     this.power = power;
-    this.state = 'alive'; // 'alive' | 'dying' | 'dead'
+    this.state = 'alive'; // 'alive' | 'dying' | 'dead' | 'flag' | 'walkout' | 'done'
     this.invincible = 0;
     this.stompChain = 0;
     this.animTime = 0;
     this.deathTimer = 0;
     this.hopped = false;
     this.ceilingHit = null;
+    this.flagBottom = 0;
+    this.flagTimer = 0;
+    this.walkStartX = 0;
   }
 
   get vulnerable() {
@@ -31,6 +34,10 @@ export class Player {
   update(dt, world, input) {
     if (this.state === 'dying') {
       this.updateDying(dt);
+      return;
+    }
+    if (this.state === 'flag' || this.state === 'walkout') {
+      this.updateFlag(dt, world);
       return;
     }
     if (this.state !== 'alive') return;
@@ -81,6 +88,42 @@ export class Player {
     world.audio.play('death');
   }
 
+  grabFlag(world, pole) {
+    if (this.state !== 'alive') return;
+    const b = this.body;
+    this.state = 'flag';
+    b.vx = 0;
+    b.vy = 0;
+    b.x = pole.x + pole.w / 2 - b.w / 2;
+    b.px = b.x;
+    this.flagBottom = pole.y + pole.h;
+    this.flagTimer = 0;
+    world.audio.stopMusic();
+    world.audio.play('flag');
+  }
+
+  updateFlag(dt, world) {
+    const b = this.body;
+    this.flagTimer += dt;
+    if (this.state === 'flag') {
+      b.px = b.x;
+      b.py = b.y;
+      b.y = Math.min(b.y + PLAYER.flagSlideSpeed * dt, this.flagBottom - b.h);
+      if (b.y + b.h >= this.flagBottom) {
+        this.state = 'walkout';
+        this.flagTimer = 0;
+        this.walkStartX = b.x;
+        this.motor.facing = 1;
+      }
+      return;
+    }
+    b.vx = PLAYER.walkOutSpeed;
+    applyGravity(b, dt);
+    moveBody(b, world.tiles, dt);
+    this.animTime += (dt * Math.abs(b.vx)) / 40;
+    if (b.x - this.walkStartX >= PLAYER.walkOutDistance || this.flagTimer >= PLAYER.walkOutTimeout) this.state = 'done';
+  }
+
   hurt(world) {
     if (!this.vulnerable) return false;
     const next = applyHit(this.power);
@@ -125,7 +168,9 @@ export class Player {
     const dying = this.state === 'dying';
     const size = dying || this.power === 'small' ? 'small' : 'big';
     let pose = 'idle';
-    if (dying || !b.onGround) pose = 'jump';
+    if (dying) pose = 'jump';
+    else if (this.state === 'flag') pose = 'idle';
+    else if (!b.onGround) pose = 'jump';
     else if (Math.abs(b.vx) > 4) pose = Math.floor(this.animTime * 3) % 2 ? 'run1' : 'run2';
     drawBodySprite(ctx, camera, alpha, b, `${size}_${pose}`, {
       flip: this.motor.facing < 0,

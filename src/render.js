@@ -32,3 +32,13 @@ export function drawBodySprite(ctx, camera, alpha, body, name, opts) {
   const y = pos.y + body.h - img.height;
   drawSprite(ctx, name, x, y, opts);
 }
+
+export function drawFlag(ctx, world, camX) {
+  const { pole, flagY } = world;
+  const x = Math.round(pole.x - camX);
+  ctx.fillStyle = '#58d854';
+  ctx.fillRect(x, pole.y, pole.w, pole.h);
+  ctx.fillStyle = '#f8b800';
+  ctx.fillRect(x - 1, pole.y - 4, 4, 4);
+  drawSprite(ctx, 'flag', pole.x - camX - 14, flagY);
+}

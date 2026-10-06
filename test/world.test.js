@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { updateWorld } from '../src/world.js';
 import { resolveInteractions } from '../src/interactions.js';
-import { GAME } from '../src/constants.js';
+import { GAME, PLAYER, TILE } from '../src/constants.js';
 import { Fireball } from '../src/entities/fireball.js';
 import { makeWorld, idleInput } from './helpers.js';
 
@@ -253,4 +253,69 @@ test('a fireball bounces along the ground and dies on a wall', () => {
   }
   assert.equal(bounced, true);
   assert.equal(fb.alive, false);
+});
+
+function touchPole(world) {
+  const pole = world.pole;
+  Object.assign(world.player.body, { x: pole.x - 5, y: 120, py: 120, vy: 0 });
+  updateWorld(world, DT, idleInput);
+}
+
+test('the goal pole spans nine tiles above the flag cell and the flag cell itself', () => {
+  const world = makeWorld();
+  assert.deepEqual(world.pole, { x: 37 * TILE + 7, y: 2 * TILE, w: 2, h: 10 * TILE });
+});
+
+test('touching the pole starts the flag sequence and stops the music', () => {
+  const world = makeWorld();
+  touchPole(world);
+  assert.equal(world.player.state, 'flag');
+  assert.ok(world.audio.calls.includes('stopMusic'));
+  assert.ok(world.audio.calls.includes('flag'));
+});
+
+test('the flag sequence ends in done even when a wall blocks the walk-out', () => {
+  const world = makeWorld();
+  touchPole(world);
+  const flagY0 = world.flagY;
+  let steps = 0;
+  while (world.player.state !== 'done' && steps < 60 * 8) {
+    updateWorld(world, DT, idleInput);
+    steps++;
+  }
+  assert.equal(world.player.state, 'done');
+  assert.ok(world.flagY > flagY0, 'the pennant slid down');
+  assert.ok(steps / 60 <= PLAYER.walkOutTimeout + 3, `took ${steps} steps`);
+});
+
+test('the level timer counts down while playing', () => {
+  const world = makeWorld();
+  const t0 = world.time;
+  run(world, 60);
+  assert.ok(Math.abs(world.time - (t0 - 1)) < 1e-6);
+});
+
+test('running out of time kills the player', () => {
+  const world = makeWorld();
+  world.time = 0.01;
+  run(world, 3);
+  assert.equal(world.time, 0);
+  assert.equal(world.player.state, 'dying');
+});
+
+test('the timer stops once the flag is grabbed', () => {
+  const world = makeWorld();
+  touchPole(world);
+  const t = world.time;
+  run(world, 30);
+  assert.equal(world.time, t);
+});
+
+test('the world freezes while the player is dying', () => {
+  const world = makeWorld({ edit: (g) => { g[11][10] = 'G'; } });
+  const g = first(world, 'goomba');
+  world.player.die(world);
+  const x0 = g.body.x;
+  run(world, 30);
+  assert.equal(g.body.x, x0);
 });

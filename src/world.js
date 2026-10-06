@@ -1,14 +1,15 @@
 // src/world.js
-import { TILE } from './constants.js';
-import { createCamera } from './camera.js';
+import { TILE, GAME, PLAYER } from './constants.js';
+import { createCamera, inActiveRange } from './camera.js';
+import { overlaps } from './physics.js';
 import { Player } from './entities/player.js';
 import { createFromSpawn } from './entities/index.js';
-import { drawBackground, drawTiles } from './render.js';
+import { drawBackground, drawTiles, drawFlag } from './render.js';
 import { resolveInteractions, isLive } from './interactions.js';
-import { inActiveRange } from './camera.js';
 import { hitBlock, updateBumps, bumpOffset } from './blocks.js';
 
 export function createWorld({ level, session, audio }) {
+  const pole = { x: level.flag.col * TILE + 7, y: (level.flag.row - 9) * TILE, w: 2, h: 10 * TILE };
   const world = {
     level,
     tiles: level.tiles,
@@ -18,6 +19,9 @@ export function createWorld({ level, session, audio }) {
     entities: [],
     bumps: [],
     player: null,
+    time: GAME.levelTime,
+    pole,
+    flagY: pole.y + 4,
     spawn(entity) {
       world.entities.push(entity);
       return entity;
@@ -35,10 +39,18 @@ export function updateWorld(world, dt, input) {
     player.update(dt, world, input);
     return;
   }
+  if (player.state === 'alive') {
+    world.time = Math.max(0, world.time - dt);
+    if (world.time === 0) player.die(world);
+  }
   player.update(dt, world, input);
   if (player.ceilingHit) {
     hitBlock(world, player.ceilingHit.col, player.ceilingHit.row, player);
     player.ceilingHit = null;
+  }
+  if (player.state === 'alive' && overlaps(player.body, world.pole)) player.grabFlag(world, world.pole);
+  if (player.state === 'flag') {
+    world.flagY = Math.min(world.flagY + PLAYER.flagSlideSpeed * dt, world.pole.y + world.pole.h - 16);
   }
   camera.update(player.body.x + player.body.w / 2);
   for (const e of world.entities) if (isLive(world, e)) e.update(dt, world);
@@ -50,6 +62,7 @@ export function updateWorld(world, dt, input) {
 export function renderWorld(world, ctx, alpha) {
   const camX = world.camera.renderX(alpha);
   drawBackground(ctx);
+  drawFlag(ctx, world, camX);
   for (const e of world.entities) if (inActiveRange(world.camera, e.body)) e.render(ctx, world.camera, alpha);
   drawTiles(ctx, world.tiles, camX, (c, r) => bumpOffset(world, c, r));
   world.player.render(ctx, world.camera, alpha);
