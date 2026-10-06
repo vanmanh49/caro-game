@@ -107,8 +107,9 @@ P.....................#####..........|...
 | `P` | player start |
 | `F` | goal flag |
 | `\|` | pipe |
+| `-` | one-way platform (solid only when landing on it from above) |
 
-`level.js` parses the grid into a tile map and a spawn list. A validator requires exactly one `P` and one `F`, equal row lengths, and no unknown characters; errors name the level, row, and column. Levels are listed in `levels/index.js`; clearing one advances to the next, and the last leads to the win screen.
+All levels are exactly 14 rows tall (the camera scrolls horizontally only). `level.js` parses the grid into a tile map and a spawn list. A validator requires exactly one `P` and one `F`, 14 rows, equal row lengths, and no unknown characters; errors name the level, row (1-based), and column (1-based). Levels are listed in `levels/index.js`; clearing one advances to the next, and the last leads to the win screen.
 
 ## 6. Player state and entities
 
