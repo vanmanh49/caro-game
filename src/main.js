@@ -1,24 +1,25 @@
 // src/main.js
-import { VIEW_W, VIEW_H } from './constants.js';
 import { startLoop } from './loop.js';
 import { createInput } from './input.js';
+import { loadLevel } from './levels/index.js';
+import { createSession } from './session.js';
+import { createWorld, updateWorld, renderWorld } from './world.js';
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false;
 const input = createInput(window);
+const audio = { play() {}, startMusic() {}, stopMusic() {} }; // replaced by the real synth in Task 10
+const session = createSession();
+let world = createWorld({ level: loadLevel(0), session, audio });
 
-let t = 0;
 startLoop({
   update(dt) {
-    t += dt;
+    updateWorld(world, dt, input);
+    if (world.player.state === 'dead') world = createWorld({ level: loadLevel(0), session, audio });
     input.endFrame();
   },
-  render() {
-    ctx.fillStyle = '#5c94fc';
-    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
-    ctx.fillStyle = '#fff';
-    ctx.font = '8px monospace';
-    ctx.fillText(`PIXEL PLUMBER  t=${t.toFixed(1)}`, 8, 16);
+  render(alpha) {
+    renderWorld(world, ctx, alpha);
   },
 });

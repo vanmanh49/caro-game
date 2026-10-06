@@ -20,3 +20,15 @@ export function levelText({ cols = 40, edit } = {}) {
   if (edit) edit(grid);
   return '\n' + grid.map((r) => r.join('')).join('\n') + '\n';
 }
+
+export function mockAudio() {
+  const calls = [];
+  return {
+    calls,
+    play: (name) => calls.push(name),
+    startMusic: () => calls.push('startMusic'),
+    stopMusic: () => calls.push('stopMusic'),
+  };
+}
+
+export const idleInput = { isDown: () => false, wasPressed: () => false };
