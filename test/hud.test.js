@@ -20,3 +20,9 @@ test('hudItems lists score, coins, lives, world and time', () => {
     ['SCORE', '001500'], ['COINS', 'x07'], ['LIVES', 'x3'], ['WORLD', '1-1'], ['TIME', '124'],
   ]);
 });
+
+test('hudItems keeps the base layout and spreads across a wider view', () => {
+  const session = { score: 0, coins: 0, lives: 3 };
+  assert.deepEqual(hudItems(session, 0, '1-1', 256).map((i) => i.x), [8, 72, 120, 168, 216]);
+  assert.deepEqual(hudItems(session, 0, '1-1', 512).map((i) => i.x), [16, 144, 240, 336, 432]);
+});

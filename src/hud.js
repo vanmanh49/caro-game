@@ -1,15 +1,21 @@
 // src/hud.js
+import { VIEW_MIN_W } from './constants.js';
+import { view } from './viewport.js';
+
 export const formatScore = (n, digits = 6) => String(Math.max(0, Math.floor(n))).padStart(digits, '0');
 export const formatTime = (seconds) => String(Math.max(0, Math.ceil(seconds))).padStart(3, '0');
 
-export function hudItems(session, time, levelName) {
-  return [
+// Columns are laid out for the base view and spread across wider ones.
+export function hudItems(session, time, levelName, width = view.w) {
+  const items = [
     { x: 8, label: 'SCORE', value: formatScore(session.score) },
     { x: 72, label: 'COINS', value: `x${String(session.coins).padStart(2, '0')}` },
     { x: 120, label: 'LIVES', value: `x${session.lives}` },
     { x: 168, label: 'WORLD', value: levelName },
     { x: 216, label: 'TIME', value: formatTime(time) },
   ];
+  const spread = width / VIEW_MIN_W;
+  return items.map((item) => ({ ...item, x: Math.round(item.x * spread) }));
 }
 
 export function drawHud(ctx, session, time, levelName) {

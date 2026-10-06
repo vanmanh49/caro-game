@@ -1,5 +1,6 @@
 // src/sprites.js
 import { PALETTE, SPRITES } from './spriteData.js';
+import { view } from './viewport.js';
 
 const SCALE = 2;
 const cache = new Map();
@@ -30,17 +31,22 @@ export function getSprite(name, swap = null) {
   return canvas;
 }
 
+const snap = (v, scale) => Math.round(v * scale) / scale;
+
 export function drawSprite(ctx, name, x, y, { flip = false, flipY = false, swap = null } = {}) {
   const img = getSprite(name, swap);
-  const X = Math.round(x);
-  const Y = Math.round(y);
+  // Snap both edges to device pixels so neighbouring tiles meet without seams at any scale.
+  const X = snap(Math.round(x), view.sx);
+  const Y = snap(Math.round(y), view.sy);
+  const w = snap(Math.round(x) + img.width, view.sx) - X;
+  const h = snap(Math.round(y) + img.height, view.sy) - Y;
   if (!flip && !flipY) {
-    ctx.drawImage(img, X, Y);
+    ctx.drawImage(img, X, Y, w, h);
     return;
   }
   ctx.save();
-  ctx.translate(X + (flip ? img.width : 0), Y + (flipY ? img.height : 0));
+  ctx.translate(X + (flip ? w : 0), Y + (flipY ? h : 0));
   ctx.scale(flip ? -1 : 1, flipY ? -1 : 1);
-  ctx.drawImage(img, 0, 0);
+  ctx.drawImage(img, 0, 0, w, h);
   ctx.restore();
 }

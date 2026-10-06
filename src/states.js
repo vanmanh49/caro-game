@@ -1,5 +1,6 @@
 // src/states.js
-import { VIEW_W, VIEW_H, GAME } from './constants.js';
+import { VIEW_H, GAME } from './constants.js';
+import { view } from './viewport.js';
 import { LEVELS, loadLevel } from './levels/index.js';
 import { createSession, addScore, loseLife, advanceLevel } from './session.js';
 import { createWorld, updateWorld, renderWorld } from './world.js';
@@ -15,7 +16,7 @@ function text(ctx, str, x, y, { align = 'center', color = '#fff', size = 8 } = {
 }
 
 function drawGroundStrip(ctx) {
-  for (let c = 0; c < VIEW_W / 16; c++) {
+  for (let c = 0; c < view.w / 16; c++) {
     drawSprite(ctx, 'ground', c * 16, VIEW_H - 32);
     drawSprite(ctx, 'ground', c * 16, VIEW_H - 16);
   }
@@ -63,12 +64,13 @@ export function createStates({ input, audio, store, go, levelCount = LEVELS.leng
       render(ctx) {
         drawBackground(ctx);
         drawGroundStrip(ctx);
-        drawSprite(ctx, 'big_idle', 120, VIEW_H - 64);
-        text(ctx, 'PIXEL PLUMBER', VIEW_W / 2, 64, { size: 16 });
-        text(ctx, 'PRESS ENTER OR SPACE', VIEW_W / 2, 96);
-        text(ctx, 'ARROWS/AD MOVE   SPACE JUMP', VIEW_W / 2, 120);
-        text(ctx, 'SHIFT RUN   X FIRE   M MUTE', VIEW_W / 2, 132);
-        text(ctx, `HI ${formatScore(hiScore)}`, VIEW_W / 2, 156);
+        drawSprite(ctx, 'big_idle', view.w / 2 - 8, VIEW_H - 64);
+        text(ctx, 'PIXEL PLUMBER', view.w / 2, 56, { size: 16 });
+        text(ctx, 'PRESS ENTER OR SPACE', view.w / 2, 84);
+        text(ctx, 'ARROWS/AD MOVE   SPACE JUMP', view.w / 2, 104);
+        text(ctx, 'SHIFT RUN   X FIRE   M MUTE', view.w / 2, 116);
+        text(ctx, 'F FULLSCREEN', view.w / 2, 128);
+        text(ctx, `HI ${formatScore(hiScore)}`, view.w / 2, 148);
       },
     },
 
@@ -115,8 +117,8 @@ export function createStates({ input, audio, store, go, levelCount = LEVELS.leng
       render(ctx, alpha) {
         renderWorld(world, ctx, alpha);
         drawHud(ctx, session, 0, world.level.name);
-        text(ctx, 'COURSE CLEAR!', VIEW_W / 2, 90, { size: 16 });
-        text(ctx, `TIME BONUS ${bonus}`, VIEW_W / 2, 110);
+        text(ctx, 'COURSE CLEAR!', view.w / 2, 90, { size: 16 });
+        text(ctx, `TIME BONUS ${bonus}`, view.w / 2, 110);
       },
     },
 
@@ -133,10 +135,10 @@ export function createStates({ input, audio, store, go, levelCount = LEVELS.leng
       },
       render(ctx) {
         drawBackground(ctx);
-        text(ctx, 'GAME OVER', VIEW_W / 2, 90, { size: 16 });
-        text(ctx, `SCORE ${formatScore(session.score)}`, VIEW_W / 2, 116);
-        text(ctx, `HI ${formatScore(hiScore)}`, VIEW_W / 2, 130);
-        text(ctx, 'PRESS ENTER OR SPACE', VIEW_W / 2, 156);
+        text(ctx, 'GAME OVER', view.w / 2, 90, { size: 16 });
+        text(ctx, `SCORE ${formatScore(session.score)}`, view.w / 2, 116);
+        text(ctx, `HI ${formatScore(hiScore)}`, view.w / 2, 130);
+        text(ctx, 'PRESS ENTER OR SPACE', view.w / 2, 156);
       },
     },
 
@@ -154,10 +156,10 @@ export function createStates({ input, audio, store, go, levelCount = LEVELS.leng
       render(ctx) {
         drawBackground(ctx);
         drawGroundStrip(ctx);
-        text(ctx, 'YOU WIN!', VIEW_W / 2, 80, { size: 16 });
-        text(ctx, `SCORE ${formatScore(session.score)}`, VIEW_W / 2, 110);
-        text(ctx, `HI ${formatScore(hiScore)}`, VIEW_W / 2, 124);
-        text(ctx, 'PRESS ENTER OR SPACE', VIEW_W / 2, 150);
+        text(ctx, 'YOU WIN!', view.w / 2, 80, { size: 16 });
+        text(ctx, `SCORE ${formatScore(session.score)}`, view.w / 2, 110);
+        text(ctx, `HI ${formatScore(hiScore)}`, view.w / 2, 124);
+        text(ctx, 'PRESS ENTER OR SPACE', view.w / 2, 150);
       },
     },
 
@@ -171,9 +173,9 @@ export function createStates({ input, audio, store, go, levelCount = LEVELS.leng
       },
       render(ctx) {
         ctx.fillStyle = '#400';
-        ctx.fillRect(0, 0, VIEW_W, VIEW_H);
-        text(ctx, 'LEVEL ERROR', VIEW_W / 2, 40, { size: 16, color: '#f88' });
-        wrap(message, 48).forEach((line, i) => text(ctx, line, VIEW_W / 2, 70 + i * 12, { color: '#fcc' }));
+        ctx.fillRect(0, 0, view.w, VIEW_H);
+        text(ctx, 'LEVEL ERROR', view.w / 2, 40, { size: 16, color: '#f88' });
+        wrap(message, 48).forEach((line, i) => text(ctx, line, view.w / 2, 70 + i * 12, { color: '#fcc' }));
       },
     },
   };

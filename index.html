@@ -5,9 +5,10 @@
   <title>Pixel Plumber</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    html, body { margin: 0; height: 100%; background: #000; }
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #000; }
     body { display: flex; align-items: center; justify-content: center; }
-    canvas { width: min(100vw, calc(100vh * 8 / 7), 768px); height: auto; aspect-ratio: 8 / 7; flex: none; image-rendering: pixelated; background: #5c94fc; }
+    /* Sized by src/viewport.js to fill the window at device resolution. */
+    canvas { display: block; flex: none; image-rendering: pixelated; background: #5c94fc; touch-action: none; }
   </style>
 </head>
 <body>

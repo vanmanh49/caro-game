@@ -1,5 +1,6 @@
 // src/entities/fireball.js
-import { TILE, VIEW_W, ITEM } from '../constants.js';
+import { TILE, ITEM } from '../constants.js';
+import { view } from '../viewport.js';
 import { createBody, applyGravity, moveBody } from '../physics.js';
 import { drawBodySprite } from '../render.js';
 
@@ -20,7 +21,7 @@ export class Fireball {
     if (hit.landed) b.vy = -ITEM.fireballBounce;
     if (hit.wall || hit.ceiling) this.alive = false;
     const cam = world.camera;
-    if (b.x < cam.x - 16 || b.x > cam.x + VIEW_W + 16 || b.y > world.tiles.rows * TILE + 16) this.alive = false;
+    if (b.x < cam.x - 16 || b.x > cam.x + view.w + 16 || b.y > world.tiles.rows * TILE + 16) this.alive = false;
   }
 
   render(ctx, camera, alpha) {

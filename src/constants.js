@@ -1,6 +1,8 @@
 // src/constants.js
 export const TILE = 16;
-export const VIEW_W = 256;
+// The view width follows the window (see viewport.js) within these bounds.
+export const VIEW_MIN_W = 256;
+export const VIEW_MAX_W = 480;
 export const VIEW_H = 224;
 export const LEVEL_ROWS = VIEW_H / TILE;
 export const STEP = 1 / 60;

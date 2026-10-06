@@ -1,7 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createCamera, inActiveRange } from '../src/camera.js';
-import { VIEW_W } from '../src/constants.js';
+import { view } from '../src/viewport.js';
+
+const VIEW_W = view.w;
 
 test('centers on the target', () => {
   const cam = createCamera(1000);
@@ -39,4 +41,19 @@ test('inActiveRange covers the view plus a margin on each side', () => {
   assert.equal(inActiveRange(cam, { x: 100 + VIEW_W + 40, w: 14 }), false);
   assert.equal(inActiveRange(cam, { x: 100 - 60, w: 14 }), true);
   assert.equal(inActiveRange(cam, { x: 100 - 100, w: 14 }), false);
+});
+
+test('follows the live view width when the window is resized', () => {
+  const cam = createCamera(1000);
+  cam.update(990);
+  view.w = 400;
+  try {
+    assert.equal(cam.maxX, 600);
+    assert.equal(cam.renderX(1), 600);
+    cam.update(500);
+    assert.equal(cam.x, 300);
+    assert.equal(inActiveRange(cam, { x: 300 + 400 + 20, w: 14 }), true);
+  } finally {
+    view.w = VIEW_W;
+  }
 });

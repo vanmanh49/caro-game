@@ -19,6 +19,7 @@ Then open http://localhost:8000 (ES modules need an HTTP origin, so double-click
 | Run | Shift |
 | Fireball | X (after picking up a fire flower) |
 | Mute | M |
+| Fullscreen | F |
 | Start | Enter or Space |
 
 ## Tests
