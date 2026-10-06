@@ -1,5 +1,8 @@
 // test/helpers.js
 import { TileMap, T } from '../src/tiles.js';
+import { parseLevel } from '../src/level.js';
+import { createSession } from '../src/session.js';
+import { createWorld } from '../src/world.js';
 
 const CHAR_TO_TILE = {
   '.': T.EMPTY, '#': T.GROUND, B: T.BRICK, '?': T.QBLOCK, M: T.QBLOCK, U: T.USED, '-': T.ONEWAY, '|': T.PIPE,
@@ -32,3 +35,9 @@ export function mockAudio() {
 }
 
 export const idleInput = { isDown: () => false, wasPressed: () => false };
+
+export function makeWorld({ edit, power = 'small', cols = 40 } = {}) {
+  const session = createSession();
+  session.power = power;
+  return createWorld({ level: parseLevel('test', levelText({ cols, edit })), session, audio: mockAudio() });
+}
