@@ -48,9 +48,9 @@ export class Goomba {
     this.body.vy = -ENEMY.knockVel;
   }
 
-  touchPlayer(world, player) {
+  touchPlayer(world, player, vy = player.body.vy) {
     if (this.state !== 'walk') return;
-    if (classifyContact(player.body, this.body) === 'stomp') stompEnemy(world, player, this);
+    if (classifyContact(player.body, this.body, vy) === 'stomp') stompEnemy(world, player, this);
     else player.hurt(world);
   }
 

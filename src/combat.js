@@ -2,8 +2,8 @@
 import { PHYS, GAME } from './constants.js';
 import { addScore } from './session.js';
 
-export function classifyContact(playerBody, enemyBody) {
-  const falling = playerBody.vy > 0;
+export function classifyContact(playerBody, enemyBody, vy = playerBody.vy) {
+  const falling = vy > 0;
   const wasAbove = playerBody.py + playerBody.h <= enemyBody.y + enemyBody.h / 2;
   return falling && wasAbove ? 'stomp' : 'side';
 }

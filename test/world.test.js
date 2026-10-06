@@ -202,3 +202,15 @@ test('a squashed goomba disappears after a moment', () => {
   run(world, 45);
   assert.equal(first(world, 'goomba'), undefined);
 });
+
+test('stomping two adjacent goombas in one pass does not hurt the player', () => {
+  const world = makeWorld({ edit: (g) => { g[11][10] = 'G'; g[11][11] = 'G'; } });
+  const [g1, g2] = world.entities.filter((e) => e.kind === 'goomba');
+  dropOnto(world, g1);
+  world.player.body.x = g1.body.x + 8; // overlaps both heads
+  resolveInteractions(world);
+  assert.equal(g1.state, 'squashed');
+  assert.equal(g2.state, 'squashed');
+  assert.equal(world.player.state, 'alive');
+  assert.equal(world.session.score, 300);
+});

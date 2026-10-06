@@ -55,9 +55,9 @@ export class Koopa {
     this.body.vy = -ENEMY.knockVel;
   }
 
-  touchPlayer(world, player) {
+  touchPlayer(world, player, vy = player.body.vy) {
     if (this.state === 'knocked' || this.kickCooldown > 0) return;
-    const kind = classifyContact(player.body, this.body);
+    const kind = classifyContact(player.body, this.body, vy);
     if (this.state === 'shell') {
       this.kick(player.body.x + player.body.w / 2 < this.body.x + this.body.w / 2 ? 1 : -1);
       if (kind === 'stomp') {

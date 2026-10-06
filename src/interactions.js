@@ -14,10 +14,11 @@ export function resolveInteractions(world) {
   const enemies = live.filter((e) => e.isEnemy);
 
   if (player.state === 'alive') {
+    const vy = player.body.vy; // a stomp bounce must not turn later contacts this pass into side hits
     for (const e of live) {
       if (player.state !== 'alive') break;
       if (!e.alive || !overlaps(player.body, e.body)) continue;
-      if (e.isEnemy) e.touchPlayer(world, player);
+      if (e.isEnemy) e.touchPlayer(world, player, vy);
       else if (e.isPickup && e.canPickup) e.pickup(world, player);
     }
   }

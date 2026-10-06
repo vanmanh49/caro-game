@@ -53,3 +53,8 @@ test('stompEnemy stomps, bounces the player, scores the chain and plays a sound'
   assert.equal(p.stompChain, 2);
   assert.deepEqual(world.audio.calls, ['stomp', 'stomp']);
 });
+
+test('classifyContact uses an explicit vy over the body vy', () => {
+  assert.equal(classifyContact(player(168, 160, -100), enemy(), 100), 'stomp');
+  assert.equal(classifyContact(player(168, 160, 100), enemy(), -100), 'side');
+});
