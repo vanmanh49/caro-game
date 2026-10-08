@@ -1,0 +1,55 @@
+:root {
+  --font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 24px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur: 180ms;
+  --gutter: 16px;
+
+  --bg: #0d1021;
+  --bg-glow-1: rgba(124, 140, 255, 0.18);
+  --bg-glow-2: rgba(255, 112, 136, 0.12);
+  --surface: rgba(255, 255, 255, 0.06);
+  --surface-strong: rgba(255, 255, 255, 0.1);
+  --panel-solid: #181c3a;
+  --border: rgba(255, 255, 255, 0.16);
+  --text: #f3f5ff;
+  --muted: #b4bad8;
+  --accent: #8b9bff;
+  --accent-contrast: #0d1021;
+  --board: #171b38;
+  --grid: #4b5496;
+  --win-tint: 20%;
+  --x: #ff7088;
+  --o: #52d9ff;
+  --win: #ffd166;
+  --focus: #ffd166;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-board: 0 18px 50px rgba(0, 0, 0, 0.45);
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #f1f2fb;
+  --bg-glow-1: rgba(68, 85, 224, 0.14);
+  --bg-glow-2: rgba(214, 34, 63, 0.08);
+  --surface: rgba(255, 255, 255, 0.75);
+  --surface-strong: #ffffff;
+  --panel-solid: #ffffff;
+  --border: rgba(20, 23, 58, 0.18);
+  --text: #14173a;
+  --muted: #474c78;
+  --accent: #3d4fdb;
+  --accent-contrast: #ffffff;
+  --board: #fbfaf4;
+  --grid: #9aa0cc;
+  --win-tint: 30%;
+  --x: #cf1f3d;
+  --o: #0a76a6;
+  --win: #f2b01e;
+  --focus: #14173a;
+  --shadow: 0 10px 30px rgba(20, 23, 58, 0.12);
+  --shadow-board: 0 18px 40px rgba(20, 23, 58, 0.16);
+  color-scheme: light;
+}
