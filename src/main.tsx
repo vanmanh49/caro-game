@@ -7,6 +7,7 @@ import './styles/base.css';
 import './styles/animations.css';
 import './styles/board.css';
 import './styles/panels.css';
+import './styles/screens.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
