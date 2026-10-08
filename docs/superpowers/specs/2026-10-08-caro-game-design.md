@@ -46,10 +46,10 @@ The project is complete only when all of these are verified by running the app:
 
 ```text
 src/
-  game/        types.ts, board.ts, rules.ts, gameEngine.ts, reducer.ts
-  ai/          aiPlayer.ts, easyAI.ts, mediumAI.ts, hardAI.ts, expertAI.ts,
-               minimax.ts, evaluation.ts, candidates.ts, zobrist.ts,
-               ai.worker.ts, workerClient.ts
+  game/        types.ts, board.ts, rules.ts, gameEngine.ts, reducer.ts, scoreboard.ts
+  ai/          aiPlayer.ts, computeMove.ts, types.ts, grid.ts, easyAI.ts, mediumAI.ts,
+               hardAI.ts, expertAI.ts, minimax.ts, threats.ts, evaluation.ts,
+               candidates.ts, zobrist.ts, ai.worker.ts, workerClient.ts
   hooks/       useGame.ts, useAI.ts, useLocalStorage.ts, useTheme.ts, useSound.ts
   components/  HomeScreen, GameSetup, GameBoard, BoardCell, GameStatus, ScoreBoard,
                GameControls, DifficultySelector, PieceSelector, ResultModal,
@@ -148,7 +148,7 @@ The returned move is always a valid empty cell. If the AI throws, times out or r
   - Provides `scoreCell(attack, defence)` for ordering and for the Easy/Medium heuristics.
 - `minimax.ts`: negamax with alpha-beta pruning.
   - Candidate limit per node.
-  - Move ordering: transposition-table move, then killer moves, then history heuristic, then heuristic score.
+  - Move ordering: transposition-table move, then killer moves, then static heuristic score.
   - Immediate-win and immediate-block shortcuts at each node.
   - Optional deadline check, so Expert can stop mid-search.
 - `zobrist.ts`: Zobrist hashing for the transposition table.
@@ -162,7 +162,7 @@ The returned move is always a valid empty cell. If the AI throws, times out or r
 | Easy | About 70% random valid move, preferring cells near existing pieces. About 20% blocks an immediate win. About 10% plays the best heuristic cell. It takes its own immediate win only when it happens to pick it. It makes deliberate mistakes. |
 | Medium | Takes a win, blocks a loss, then picks the best heuristic cell (attack plus defence patterns). Light depth-2 search among the top candidates. |
 | Hard | Alpha-beta at fixed depth 3 over the top 12 candidates, with the full evaluation. Recognises open threes and double threats. Prefers central cells on ties. |
-| Expert | Iterative deepening from depth 2 up to 8 under a time budget of about 1.5 s. Zobrist transposition table and killer/history ordering. Before the main search, a threat-sequence search looks for a forced win (continuous fours / open-three threats) and for a forced defence. Candidate set is limited to the 12–16 best cells, which keeps 19×19 fast. Returns the best move from the last completed depth. |
+| Expert | Iterative deepening from depth 2 up to 8 under a time budget of about 1.5 s. Zobrist transposition table and killer-move plus static-heuristic move ordering. Before the main search, a threat-sequence search looks for a forced win (continuous fours / open-three threats) and for a forced defence. Candidate set is limited to the 12–16 best cells, which keeps 19×19 fast. Returns the best move from the last completed depth. |
 
 Expert must clearly beat Hard in testing. A test plays Expert against Hard, and Expert must not lose.
 
