@@ -60,7 +60,7 @@
 }
 
 .cell--win {
-  background: color-mix(in srgb, var(--win) 30%, transparent);
+  background: color-mix(in srgb, var(--win) var(--win-tint), transparent);
   animation: winPulse 1.2s ease-in-out infinite;
   z-index: 1;
 }

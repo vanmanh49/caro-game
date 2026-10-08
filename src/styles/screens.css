@@ -21,7 +21,7 @@
 }
 .mini__cell { display: grid; place-items: center; box-shadow: inset 0 0 0 0.5px var(--grid); }
 .mini__cell .piece { width: 76%; height: 76%; }
-.mini__cell--hl { background: color-mix(in srgb, var(--win) 30%, transparent); }
+.mini__cell--hl { background: color-mix(in srgb, var(--win) var(--win-tint), transparent); }
 
 .setup { display: grid; gap: 18px; max-width: 40rem; margin: 0 auto; padding: 8px 0 32px; }
 .setup__intro { display: grid; gap: 4px; text-align: center; }
