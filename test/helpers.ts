@@ -13,3 +13,8 @@ export function boardWith(size: number, stones: Stones): Board {
 export function line(row: number, col: number, dr: number, dc: number, n: number): [number, number][] {
   return Array.from({ length: n }, (_, i): [number, number] => [row + dr * i, col + dc * i]);
 }
+
+/** Builds a board from ASCII rows: 'X', 'O', anything else is empty. */
+export function boardFromRows(rows: readonly string[]): Board {
+  return rows.map((row) => [...row].map((ch): Cell => (ch === 'X' ? 'X' : ch === 'O' ? 'O' : null)));
+}

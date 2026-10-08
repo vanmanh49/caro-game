@@ -36,11 +36,21 @@ export function fourCompletions(g: Grid, idx: number, code: Code): number[] {
   return out;
 }
 
+/** Time budget shared by one threat search; `expired` means "ran out of time", never "no threat exists". */
+interface Budget {
+  deadline: number;
+  expired: boolean;
+}
+
 /** Victory by continuous fours: `code` to move; returns the first move of a forced win, or null. */
-function vcf(g: Grid, code: Code, depth: number, deadline: number): number | null {
+function vcf(g: Grid, code: Code, depth: number, budget: Budget): number | null {
   const cands = getCandidates(g);
   for (const c of cands) if (makesWin(g, c, code)) return c;
-  if (depth <= 0 || performance.now() > deadline) return null;
+  if (performance.now() > budget.deadline) {
+    budget.expired = true;
+    return null;
+  }
+  if (depth <= 0) return null;
   const opp = opponentOf(code);
   if (cands.some((c) => makesWin(g, c, opp))) return null;
   for (const c of cands) {
@@ -50,7 +60,7 @@ function vcf(g: Grid, code: Code, depth: number, deadline: number): number | nul
     const block = completions[0];
     g.cells[c] = code;
     g.cells[block] = opp;
-    const next = vcf(g, code, depth - 1, deadline);
+    const next = vcf(g, code, depth - 1, budget);
     g.cells[block] = 0;
     g.cells[c] = 0;
     if (next !== null) return c;
@@ -59,7 +69,7 @@ function vcf(g: Grid, code: Code, depth: number, deadline: number): number | nul
 }
 
 export function findVcfWin(g: Grid, code: Code, maxDepth = 8, timeLimitMs = 300): number | null {
-  return vcf(g, code, maxDepth, performance.now() + timeLimitMs);
+  return vcf(g, code, maxDepth, { deadline: performance.now() + timeLimitMs, expired: false });
 }
 
 /** The first of `moves` after which the opponent has no forced win by continuous fours, or null. */
@@ -71,12 +81,29 @@ export function findVcfDefence(
   deadline: number,
 ): number | null {
   const opp = opponentOf(code);
+  const budget: Budget = { deadline, expired: false };
   for (const move of moves) {
     if (g.cells[move] !== 0) continue;
     g.cells[move] = code;
-    const lost = vcf(g, opp, maxDepth, deadline) !== null;
+    const lost = opponentStillWins(g, code, opp, maxDepth, budget);
     g.cells[move] = 0;
+    if (budget.expired) return null; // out of time: the defence is unproven, so do not claim one
     if (!lost) return move;
   }
   return null;
+}
+
+/**
+ * After `code` has just moved: can `opp` still force a win? If the move made a four, `opp` must block it first,
+ * so the block is played before asking (a mere tempo gain does not remove the opponent's threat).
+ */
+function opponentStillWins(g: Grid, code: Code, opp: Code, maxDepth: number, budget: Budget): boolean {
+  const ours = getCandidates(g).filter((c) => makesWin(g, c, code));
+  if (ours.length >= 2) return false; // an open four: we win first
+  if (ours.length === 0) return vcf(g, opp, maxDepth, budget) !== null;
+  const block = ours[0];
+  g.cells[block] = opp;
+  const wins = makesWin(g, block, opp) || vcf(g, opp, maxDepth, budget) !== null;
+  g.cells[block] = 0;
+  return wins;
 }
