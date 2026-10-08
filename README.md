@@ -2,6 +2,8 @@
 
 A polished, offline browser Caro/Gomoku game built with React, TypeScript and Vite.
 
+![Caro game in progress: a 15×15 board with the scoreboard and controls](docs/screenshot.png)
+
 ## Run
 
 ```bash
