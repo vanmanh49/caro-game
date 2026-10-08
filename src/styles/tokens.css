@@ -19,7 +19,8 @@
   --accent: #8b9bff;
   --accent-contrast: #0d1021;
   --board: #171b38;
-  --grid: #38407a;
+  --grid: #4b5496;
+  --win-tint: 20%;
   --x: #ff7088;
   --o: #52d9ff;
   --win: #ffd166;
@@ -42,7 +43,8 @@
   --accent: #3d4fdb;
   --accent-contrast: #ffffff;
   --board: #fbfaf4;
-  --grid: #b4b9da;
+  --grid: #9aa0cc;
+  --win-tint: 30%;
   --x: #cf1f3d;
   --o: #0a76a6;
   --win: #f2b01e;

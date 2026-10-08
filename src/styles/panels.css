@@ -52,7 +52,8 @@
 .score__dash { font-size: 1.75rem; color: var(--muted); }
 .score__draws { margin-top: 4px; text-align: center; color: var(--muted); font-size: 0.9375rem; }
 
-.controls { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.controls .btn { padding: 0 12px; white-space: nowrap; }
 .controls__home { grid-column: 1 / -1; }
 
 .result { display: grid; gap: 6px; text-align: center; }
