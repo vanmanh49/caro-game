@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { searchBestMove } from '../src/ai/minimax';
 import { findVcfDefence, findVcfWin, fourCompletions } from '../src/ai/threats';
 import { positionToIndex, toGrid } from '../src/ai/grid';
-import { boardWith, line, type Stones } from './helpers';
+import { boardFromRows, boardWith, line, type Stones } from './helpers';
 
 const grid = (stones: Stones, size = 15) => toGrid(boardWith(size, stones), 5);
 const at = (row: number, col: number) => positionToIndex(15, { row, col });
@@ -92,5 +92,38 @@ describe('threat search', () => {
     expect(defence).not.toBe(at(0, 0));
     g.cells[defence!] = 1;
     expect(findVcfWin(g, 2, 8, 500)).toBeNull();
+  });
+
+  it('findVcfDefence does not accept a forcing four that leaves the threat standing', () => {
+    // Found in a real game: X threatens an open four at (9,3) (and has a second forced win). O's four at (10,11)
+    // only gains a tempo, because X simply blocks at (10,12) and still wins.
+    const g = toGrid(
+      boardFromRows([
+        '.......O.......',
+        '........X......',
+        '.........X.....',
+        '.........OX.O..',
+        '.........OOX...',
+        '.....OOXOOX.O..',
+        '...O.XXOXXX....',
+        '....XOOX.O.....',
+        '..OXXXXOX......',
+        '..X.XX..OX.....',
+        '.O..OX.XOOO....',
+        '.....X..O.X....',
+        '.....O.........',
+        '...............',
+        '...............',
+      ]),
+      5,
+    );
+    expect(findVcfWin(g, 1, 10, 500)).not.toBeNull();
+    expect(findVcfDefence(g, 2, [at(10, 11)], 10, performance.now() + 1000)).toBeNull();
+  });
+
+  it('findVcfDefence never reports an unproven defence when it runs out of time', () => {
+    const g = grid({ O: FORK.X, X: FORK.O });
+    const expired = performance.now() - 1;
+    expect(findVcfDefence(g, 1, [at(7, 7), at(7, 8), at(8, 7), at(0, 0)], 8, expired)).toBeNull();
   });
 });
